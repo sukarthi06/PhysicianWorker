@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PhysicianWorker.Application/PhysicianWorker.Application.csproj" />
+  <Project Path="PhysicianWorker.Domain/PhysicianWorker.Domain.csproj" />
+  <Project Path="PhysicianWorker.Infra/PhysicianWorker.Infra.csproj" />
+  <Project Path="PhysicianWorker.Worker/PhysicianWorker.Worker.csproj" />
+</Solution>
