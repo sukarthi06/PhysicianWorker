@@ -33,6 +33,14 @@ jobs:
             -t ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
             --push .
 
+      - name: Configure ACR pull authentication
+        run: |
+          az containerapp registry set \
+            --name physician-worker \
+            --resource-group ${{ vars.RG_NAME }} \
+            --identity system \
+            --server ${{ vars.ACR_LOGIN_SERVER }}
+
       - name: Deploy to Container App
         run: |
           az containerapp update \
