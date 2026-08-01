@@ -42,21 +42,27 @@ jobs:
             --server ${{ vars.ACR_LOGIN_SERVER }}
 
       - name: Set RabbitMQ password as Container App secret
+        env:
+          RABBITMQ_PASSWORD: ${{ secrets.RABBITMQ_PASSWORD }}
         run: |
           az containerapp secret set \
             --name physician-worker \
             --resource-group ${{ vars.RG_NAME }} \
-            --secrets rabbitmq-password=${{ secrets.RABBITMQ_PASSWORD }}
+            --secrets "rabbitmq-password=$RABBITMQ_PASSWORD"
 
       - name: Deploy to Container App
+        env:
+          RABBITMQ_HOST: ${{ secrets.RABBITMQ_HOST }}
+          RABBITMQ_VHOST: ${{ secrets.RABBITMQ_VHOST }}
+          RABBITMQ_USERNAME: ${{ secrets.RABBITMQ_USERNAME }}
         run: |
           az containerapp update \
             --name physician-worker \
             --resource-group ${{ vars.RG_NAME }} \
             --image ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
             --set-env-vars \
-              RabbitMQ__Host=${{ secrets.RABBITMQ_HOST }} \
-              RabbitMQ__Port=5671 \
-              RabbitMQ__VirtualHost=${{ secrets.RABBITMQ_VHOST }} \
-              RabbitMQ__Username=${{ secrets.RABBITMQ_USERNAME }} \
-              RabbitMQ__Password=secretref:rabbitmq-password
+              "RabbitMQ__Host=$RABBITMQ_HOST" \
+              "RabbitMQ__Port=5671" \
+              "RabbitMQ__VirtualHost=$RABBITMQ_VHOST" \
+              "RabbitMQ__Username=$RABBITMQ_USERNAME" \
+              "RabbitMQ__Password=secretref:rabbitmq-password"
