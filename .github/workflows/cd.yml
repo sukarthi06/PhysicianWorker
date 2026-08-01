@@ -10,6 +10,10 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: physician-worker-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     if: github.event.workflow_run.conclusion == 'success'
@@ -33,6 +37,19 @@ jobs:
             -t ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
             --push .
 
+      - name: Wait for any active Container App operation
+        run: |
+          for attempt in {1..60}; do
+            state="$(az containerapp show --name physician-worker --resource-group ${{ vars.RG_NAME }} --query properties.provisioningState --output tsv)"
+            case "$state" in
+              Succeeded) exit 0 ;;
+              Failed) echo "Container App is in a failed provisioning state."; exit 1 ;;
+              *) echo "Container App provisioning state: $state. Waiting..."; sleep 10 ;;
+            esac
+          done
+          echo "Timed out waiting for the Container App to become ready."
+          exit 1
+
       - name: Configure ACR pull authentication
         run: |
           az containerapp registry set \
@@ -40,6 +57,19 @@ jobs:
             --resource-group ${{ vars.RG_NAME }} \
             --identity system \
             --server ${{ vars.ACR_LOGIN_SERVER }}
+
+      - name: Wait for registry configuration
+        run: |
+          for attempt in {1..60}; do
+            state="$(az containerapp show --name physician-worker --resource-group ${{ vars.RG_NAME }} --query properties.provisioningState --output tsv)"
+            case "$state" in
+              Succeeded) exit 0 ;;
+              Failed) echo "Registry configuration failed."; exit 1 ;;
+              *) echo "Container App provisioning state: $state. Waiting..."; sleep 10 ;;
+            esac
+          done
+          echo "Timed out waiting for registry configuration."
+          exit 1
 
       - name: Set RabbitMQ password as Container App secret
         env:
@@ -49,6 +79,19 @@ jobs:
             --name physician-worker \
             --resource-group ${{ vars.RG_NAME }} \
             --secrets "rabbitmq-password=$RABBITMQ_PASSWORD"
+
+      - name: Wait for secret update
+        run: |
+          for attempt in {1..60}; do
+            state="$(az containerapp show --name physician-worker --resource-group ${{ vars.RG_NAME }} --query properties.provisioningState --output tsv)"
+            case "$state" in
+              Succeeded) exit 0 ;;
+              Failed) echo "Secret update failed."; exit 1 ;;
+              *) echo "Container App provisioning state: $state. Waiting..."; sleep 10 ;;
+            esac
+          done
+          echo "Timed out waiting for secret update."
+          exit 1
 
       - name: Deploy to Container App
         env:
