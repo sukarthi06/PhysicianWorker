@@ -41,9 +41,22 @@ jobs:
             --identity system \
             --server ${{ vars.ACR_LOGIN_SERVER }}
 
+      - name: Set RabbitMQ password as Container App secret
+        run: |
+          az containerapp secret set \
+            --name physician-worker \
+            --resource-group ${{ vars.RG_NAME }} \
+            --secrets rabbitmq-password=${{ secrets.RABBITMQ_PASSWORD }}
+
       - name: Deploy to Container App
         run: |
           az containerapp update \
             --name physician-worker \
             --resource-group ${{ vars.RG_NAME }} \
-            --image ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }}
+            --image ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
+            --set-env-vars \
+              RabbitMQ__Host=${{ secrets.RABBITMQ_HOST }} \
+              RabbitMQ__Port=5671 \
+              RabbitMQ__VirtualHost=${{ secrets.RABBITMQ_VHOST }} \
+              RabbitMQ__Username=${{ secrets.RABBITMQ_USERNAME }} \
+              RabbitMQ__Password=secretref:rabbitmq-password
