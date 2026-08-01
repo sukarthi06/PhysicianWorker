@@ -48,59 +48,7 @@ jobs:
             esac
           done
           echo "Timed out waiting for the Container App to become ready."
-          exit 1
-
-      - name: Assign system identity and grant AcrPull
-        run: |
-          az containerapp identity assign \
-            --name physician-worker \
-            --resource-group ${{ vars.RG_NAME }} \
-            --system-assigned
-
-          principal_id="$(az containerapp show \
-            --name physician-worker \
-            --resource-group ${{ vars.RG_NAME }} \
-            --query identity.principalId --output tsv)"
-
-          acr_id="$(az acr show \
-            --name ${{ vars.ACR_NAME }} \
-            --resource-group ${{ vars.RG_NAME }} \
-            --query id --output tsv)"
-
-          existing="$(az role assignment list \
-            --assignee "$principal_id" \
-            --scope "$acr_id" \
-            --role AcrPull \
-            --query "[0].id" --output tsv)"
-
-          if [ -z "$existing" ]; then
-            az role assignment create \
-              --assignee-object-id "$principal_id" \
-              --assignee-principal-type ServicePrincipal \
-              --role AcrPull \
-              --scope "$acr_id"
-          fi
-
-      - name: Configure ACR pull authentication
-        run: |
-          az containerapp registry set \
-            --name physician-worker \
-            --resource-group ${{ vars.RG_NAME }} \
-            --identity system \
-            --server ${{ vars.ACR_LOGIN_SERVER }}
-
-      - name: Wait for registry configuration
-        run: |
-          for attempt in {1..60}; do
-            state="$(az containerapp show --name physician-worker --resource-group ${{ vars.RG_NAME }} --query properties.provisioningState --output tsv)"
-            case "$state" in
-              Succeeded) exit 0 ;;
-              Failed) echo "Registry configuration failed."; exit 1 ;;
-              *) echo "Container App provisioning state: $state. Waiting..."; sleep 10 ;;
-            esac
-          done
-          echo "Timed out waiting for registry configuration."
-          exit 1
+          exit 1      
 
       - name: Set RabbitMQ password as Container App secret
         env:
