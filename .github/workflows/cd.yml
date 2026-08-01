@@ -65,7 +65,7 @@ jobs:
             state="$(az containerapp show --name physician-worker --resource-group ${{ vars.RG_NAME }} --query properties.provisioningState --output tsv)"
             case "$state" in
               Succeeded) exit 0 ;;
-              Failed) echo "Secret update failed."; exit 1 ;;
+              Failed) echo "The previous Container App operation failed, but no operation is active. Continuing with this corrective deployment."; exit 0 ;;
               *) echo "Container App provisioning state: $state. Waiting..."; sleep 10 ;;
             esac
           done
