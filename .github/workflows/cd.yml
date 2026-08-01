@@ -29,9 +29,9 @@ jobs:
       - name: Build and push image to ACR
         run: |
           az acr login --name ${{ vars.ACR_NAME }} --resource-group ${{ vars.RG_NAME }}
-          docker build -f PhysicianWorker.Worker/Dockerfile \
-            -t ${{ vars.ACR_NAME }}.azurecr.io/physician-worker-comp:${{ github.event.workflow_run.head_sha }} .
-          docker push ${{ vars.ACR_NAME }}.azurecr.io/physician-worker-comp:${{ github.event.workflow_run.head_sha }}
+          docker buildx build -f PhysicianWorker.Worker/Dockerfile \
+            -t ${{ vars.ACR_NAME }}.azurecr.io/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
+            --push .
 
       - name: Deploy to Container App
         run: |
