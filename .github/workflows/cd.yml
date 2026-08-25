@@ -112,6 +112,7 @@ jobs:
             --resource-group ${{ vars.RG_NAME }} \
             --image ${{ vars.ACR_LOGIN_SERVER }}/physician-worker-comp:${{ github.event.workflow_run.head_sha }} \
             --set-env-vars \
+              "DOTNET_ENVIRONMENT=UAT" \
               "RabbitMQ__Host=$RABBITMQ_HOST" \
               "RabbitMQ__Port=5671" \
               "RabbitMQ__VirtualHost=$RABBITMQ_VHOST" \
