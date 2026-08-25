@@ -28,10 +28,10 @@ namespace PhysicianWorker.Worker
                         await messageConsumer.RejectAsync(consumed.DeliveryTag, stoppingToken);
                     }                        
                 }
-                catch
+                catch (Exception ex)
                 {
                     await messageConsumer.RejectAsync(consumed.DeliveryTag, stoppingToken);
-                    logger.LogError("Failed to process message with RecordingId: {RecordingId} delivery tag {DeliveryTag}",
+                    logger.LogError(ex, "Failed to process message with RecordingId: {RecordingId} delivery tag {DeliveryTag}",
                         consumed.Payload.RecordingId, consumed.DeliveryTag);
                 }
             };
