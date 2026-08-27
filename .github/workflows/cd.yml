@@ -121,6 +121,8 @@ jobs:
               "PhysicianNoteService__Address=https://stt-physiciannotesapi-dev.azurewebsites.net" \
               "Otlp__Endpoint=$OTLP_ENDPOINT" \
               "Otlp__Protocol=$OTLP_PROTOCOL" \
+              "Otlp__TracesEndpoint=${OTLP_ENDPOINT%/}/v1/traces" \
+              "Otlp__MetricsEndpoint=${OTLP_ENDPOINT%/}/v1/metrics" \
               "Otlp__Headers=secretref:otlp-headers"
           echo "::notice title=Container App deployment completed::Azure accepted and completed the image update."
 
