@@ -4,6 +4,7 @@ using Serilog;
 using Serilog.Sinks.OpenTelemetry;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.AddServiceDefaults();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 if (!builder.Environment.IsEnvironment("Local"))

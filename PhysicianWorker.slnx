@@ -2,5 +2,6 @@
   <Project Path="PhysicianWorker.Application/PhysicianWorker.Application.csproj" />
   <Project Path="PhysicianWorker.Domain/PhysicianWorker.Domain.csproj" />
   <Project Path="PhysicianWorker.Infra/PhysicianWorker.Infra.csproj" />
+  <Project Path="PhysicianWorker.ServiceDefaults/PhysicianWorker.ServiceDefaults.csproj" Id="c3c3a765-e780-4195-806b-7ba337843702" />
   <Project Path="PhysicianWorker.Worker/PhysicianWorker.Worker.csproj" />
 </Solution>

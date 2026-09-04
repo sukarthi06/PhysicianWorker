@@ -15,5 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PhysicianWorker.Infra\PhysicianWorker.Infra.csproj" />
+    <ProjectReference Include="..\PhysicianWorker.ServiceDefaults\PhysicianWorker.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

@@ -40,6 +40,12 @@ public static class DependencyInjection
                 .Value;
 
             client.BaseAddress = new Uri(options.Address!);            
+        })
+        .AddStandardResilienceHandler(options =>
+        {
+            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(60);
+            options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(120);
+            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(120); // must be ≥ 2× AttemptTimeout
         });
 
         #endregion
